@@ -29,5 +29,11 @@ namespace CookBook_Api.Controllers
             })
             .ToArray();
         }
+
+        [HttpPost(Name = "GetTest")]
+        public string GetName(string name)
+        {
+            return name;
+        }
     }
 }
