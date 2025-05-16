@@ -26,6 +26,11 @@ jobs:
 
       - name: Publish for linux-arm64
         run: dotnet publish -c Release -r linux-arm64 --self-contained false -o ./publish
+
+      - name: Copy published files to server folder
+        run: |
+          rm -rf /home/something/CookBook_Api/_cba/CookBook_Api/CookBook_Api/publish/*
+          cp -r ./publish/* /home/something/CookBook_Api/_cba/CookBook_Api/CookBook_Api/publish/
       
       - name: Restart CookBook API service
         run: sudo systemctl restart cookbook-api
