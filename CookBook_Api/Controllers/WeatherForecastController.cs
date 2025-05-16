@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CookBook_Api.Controllers
@@ -33,7 +34,7 @@ namespace CookBook_Api.Controllers
         [HttpPost(Name = "GetTest")]
         public string GetName(string name)
         {
-            return name;
-        }
+            return "This is a Test: " + name;
+        }  
     }
 }
