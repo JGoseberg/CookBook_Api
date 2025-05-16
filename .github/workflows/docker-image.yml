@@ -1,30 +1,31 @@
-name: Build Docker Image
+name: Publish API with Docker on Raspberry Pi
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches:
+      - master
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: self-hosted
 
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
+      - name: Build Docker image
+        run: |
+          docker build -t cookbook-api:latest .
 
-    - name: Build Docker Image
-      run: |
-        docker build -t cookbook-api:latest .
+      - name: Stop running container
+        run: |
+          docker stop cookbook-api || true
+          docker rm cookbook-api || true
 
-    # Optional: Run tests inside the image
-    # - name: Run tests
-    #   run: docker run --rm cookbook-api dotnet test
-
-    # Optional: Push image
-    # - name: Push Docker image
-    #   run: docker tag cookbook-api yourusername/cookbook-api:latest && docker push yourusername/cookbook-api:latest
+      - name: Run Docker container
+        run: |
+          docker run -d \
+            --name cookbook-api \
+            -p 5046:8080 \
+            --restart unless-stopped \
+            cookbook-api:latest
