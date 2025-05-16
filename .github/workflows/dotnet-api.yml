@@ -36,7 +36,7 @@ jobs:
       - name: Copy published files to server folder
         run: |
           rm -rf /home/something/CookBook_Api/publish/*
-          cp -r ./publish/* /home/something/publish/
+          cp -r ./publish/* /home/something/CookBook_Api/publish/
       
       - name: Restart CookBook API service
         run: sudo systemctl restart cookbook-api
