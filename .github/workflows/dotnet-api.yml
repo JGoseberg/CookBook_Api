@@ -26,7 +26,9 @@ jobs:
 
       - name: Publish for linux-arm64
         run: dotnet publish -c Release -r linux-arm64 --self-contained false -o ./publish
-
+      
+      - name: Restart CookBook API service
+        run: sudo systemctl restart cookbook-api
 
 
 
