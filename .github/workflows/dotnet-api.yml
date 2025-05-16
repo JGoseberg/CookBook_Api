@@ -13,6 +13,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Set up dotnet path manually
+        run: |
+          echo "Adding dotnet to PATH"
+          export DOTNET_ROOT=$HOME/dotnet
+          export PATH=$DOTNET_ROOT:$PATH
+          echo "DOTNET_ROOT=$DOTNET_ROOT" >> $GITHUB_ENV
+          echo "PATH=$DOTNET_ROOT:$PATH" >> $GITHUB_ENV
+
       - name: Restore dependencies
         run: dotnet restore
 
