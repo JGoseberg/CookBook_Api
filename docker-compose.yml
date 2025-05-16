@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  cookbook-api:
+    container_name: cookbook-api
+    build:
+      context: .
+      dockerfile: CookBook_Api/Dockerfile
+    ports:
+      - "${API_PORT}:5046"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+    volumes:
+      - ./CookBook_Api:/app
+    restart: unless-stopped
