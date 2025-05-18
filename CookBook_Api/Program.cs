@@ -16,7 +16,7 @@ builder.Services.AddCors(opt =>
 
             policy.SetIsOriginAllowed(orig =>
             new Uri(orig).Host
-            .StartsWith("192.168.178."))
+            .StartsWith("192.168."))
             .AllowAnyHeader()
             .AllowAnyMethod();
         });
@@ -28,6 +28,11 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.WebHost.ConfigureKestrel(serveroption =>
+{
+    serveroption.ListenLocalhost(5046);
+});
 
 var app = builder.Build();
 
