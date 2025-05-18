@@ -5,12 +5,18 @@ builder.Services.AddCors(opt =>
     opt.AddPolicy("AllowSpecificOrigins",
         policy =>
         {
-            policy.WithOrigins(
-                "http://localhost:5173",
-                "http://localhost:3000",
-                "http://192.168.178.252:3000",
-                "http://192.168.178.252:5173"
-                )
+            //policy.WithOrigins(
+            //    "http://localhost:5173",
+            //    "http://localhost:3000",
+            //    "http://192.168.178.252:3000",
+            //    "http://192.168.178.252:5173"
+            //    )
+            //.AllowAnyHeader()
+            //.AllowAnyMethod();
+
+            policy.SetIsOriginAllowed(orig =>
+            new Uri(orig).Host
+            .StartsWith("192.168.178."))
             .AllowAnyHeader()
             .AllowAnyMethod();
         });
