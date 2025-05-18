@@ -25,17 +25,18 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-//try to run it on local network
-app.UseSwagger();
-app.UseSwaggerUI();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {       
+    //try to run it on local network
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 // try to run it on local network
-// app.UseHttpsRedirection();
+app.UseHttpsRedirection();
+
 app.UseRouting();
 app.UseCors("AllowSpecificOrigins");
 app.UseAuthorization();
