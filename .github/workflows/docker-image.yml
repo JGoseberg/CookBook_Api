@@ -27,5 +27,6 @@ jobs:
           docker run -d \
             --name cookbook-api \
             -p 5046:8080 \
+            -e ASPNETCORE_URLS=http://0.0.0.0:8080 \
             --restart unless-stopped \
             cookbook-api:latest
