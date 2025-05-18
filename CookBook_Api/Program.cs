@@ -5,7 +5,10 @@ builder.Services.AddCors(opt =>
     opt.AddPolicy("AllowSpecificOrigins",
         policy =>
         {
-            policy.WithOrigins("http://localhost:5173")
+            policy.WithOrigins(
+                "http://localhost:5173",
+                "http://192.168.178.252:3000"
+                )
             .AllowAnyHeader()
             .AllowAnyMethod();
         });
@@ -32,10 +35,10 @@ if (app.Environment.IsDevelopment())
 // try to run it on local network
 // app.UseHttpsRedirection();
 
+app.UseCors("AllowSpecificOrigins");
 app.UseAuthorization();
 
-app.MapControllers();
 
-app.UseCors("AllowSpecificOrigins");
+app.MapControllers();
 
 app.Run();
