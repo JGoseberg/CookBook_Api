@@ -1,3 +1,6 @@
+using CookBook_Api.Data;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(opt =>
@@ -23,6 +26,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
+builder.Services.AddDbContext<CookBookContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DB_CONNECTION_STRING")));
+
 builder.WebHost.ConfigureKestrel(serveroption =>
 {
     serveroption.ListenAnyIP(5046);
@@ -30,10 +38,9 @@ builder.WebHost.ConfigureKestrel(serveroption =>
 
 var app = builder.Build();
 
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
-{       
+{
     //try to run it on local network
     app.UseSwagger();
     app.UseSwaggerUI();
