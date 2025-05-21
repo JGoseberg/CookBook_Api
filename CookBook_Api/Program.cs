@@ -1,5 +1,6 @@
 using CookBook_Api.Data;
 using CookBook_Api.Interfaces;
+using CookBook_Api.Mappings;
 using CookBook_Api.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -39,6 +40,8 @@ builder.WebHost.ConfigureKestrel(serveroption =>
 {
     serveroption.ListenAnyIP(5046);
 });
+
+builder.Services.AddAutoMapper(typeof(RecipeProfile));
 
 var app = builder.Build();
 
