@@ -1,4 +1,6 @@
 using CookBook_Api.Data;
+using CookBook_Api.Interfaces;
+using CookBook_Api.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,15 +23,17 @@ builder.Services.AddCors(opt =>
 
 // Add services to the container.
 
+builder.Services.AddScoped<IRecipeRepository, RecipeRepository>();
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
 builder.Services.AddDbContext<CookBookContext>(options =>
     options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DB_CONNECTION_STRING")));
+        builder.Configuration.GetConnectionString("DefaultConnection")));
+        
 
 builder.WebHost.ConfigureKestrel(serveroption =>
 {
@@ -44,6 +48,15 @@ if (app.Environment.IsDevelopment())
     //try to run it on local network
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    var context = services.GetRequiredService<CookBookContext>();
+    context.Database.EnsureCreated();
+    DbInitializer.Initialize(context);
 }
 
 // try to run it on local network
