@@ -15,7 +15,7 @@ services:
   cookbook-api:
     build:
       context: .
-      dockerfile: CookBook_Api/Dockerfile
+      dockerfile: Dockerfile
     container_name: cookbook-api
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
