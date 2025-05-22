@@ -13,12 +13,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: debug
+        run: ls -la
+
+    
       - name: Stop and remove existing containers
-        working-directory: CookBook_Api
         run: |
           docker compose -f docker-compose.prod.yml down
 
       - name: Build and start containers
-        working-directory: CookBook_Api
         run: |
           docker compose -f docker-compose.prod.yml up -d --build
