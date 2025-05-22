@@ -1,7 +1,7 @@
 services:
   
   sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-lts
+    image: mcr.microsoft.com/mssql/server:2025-latest
     container_name: cookbook_sql
     environment:
       SA_PASSWORD: "${DB_PASSWORD}"
