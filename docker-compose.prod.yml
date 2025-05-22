@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-lts
+    container_name: cookbook_sql
+    environment:
+      SA_PASSWORD: "${DB_PASSWORD}"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Express"
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+  
+  cookbook-api:
+    build:
+      context: .
+      dockerfile: CookBook_Api/Dockerfile
+    container_name: cookbook-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - SQL_SERVER=
+      - SQL_DB=
+      - SQL_USER
+      - SQL_PASSWORD
+    ports:
+      - "${API_PORT}:5046"
+    depends_on:
+      - sqlserver
+    volumes:
+      - ./CookBook_Api:/app
+
