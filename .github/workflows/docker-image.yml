@@ -18,11 +18,9 @@ jobs:
 
     
       - name: Stop and remove existing containers
-        working-directory: CookBook_Api
         run: |
           docker compose -f docker-compose.prod.yml down
 
       - name: Build and start containers
-        working-directory: CookBook_Api
         run: |
           docker compose -f docker-compose.prod.yml up -d --build
