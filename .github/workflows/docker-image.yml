@@ -13,6 +13,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: debug
+        run: ls -la
+
+    
       - name: Stop and remove existing containers
         working-directory: CookBook_Api
         run: |
