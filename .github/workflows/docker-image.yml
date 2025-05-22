@@ -1,4 +1,4 @@
-name: Publish API with Docker on Raspberry Pi
+name: Deploy with Docker Compose on Raspberry Pi
 
 on:
   push:
@@ -6,27 +6,17 @@ on:
       - master
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: self-hosted
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Build Docker image
+      - name: Stop and remove existing containers
         run: |
-          docker build -t cookbook-api:latest .
+          docker compose -f docker-compose.prod.yml down
 
-      - name: Stop running container
+      - name: Build and start containers
         run: |
-          docker stop cookbook-api || true
-          docker rm cookbook-api || true
-
-      - name: Run Docker container
-        run: |
-          docker run -d \
-            --name cookbook-api \
-            -p 5046:8080 \
-            -e ASPNETCORE_URLS=http://0.0.0.0:8080 \
-            --restart unless-stopped \
-            cookbook-api:latest
+          docker compose -f docker-compose.prod.yml up -d --build
