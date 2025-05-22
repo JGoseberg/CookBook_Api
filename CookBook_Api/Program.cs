@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+
 builder.Services.AddCors(opt =>
 {
     opt.AddPolicy("AllowSpecificOrigins",
@@ -23,10 +25,10 @@ builder.Services.AddCors(opt =>
 });
 
 // Add services to the container.
-
 builder.Services.AddScoped<IRecipeRepository, RecipeRepository>();
 
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -34,7 +36,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<CookBookContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
-        
+
 
 builder.WebHost.ConfigureKestrel(serveroption =>
 {
@@ -58,17 +60,18 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
 
     var context = services.GetRequiredService<CookBookContext>();
-    context.Database.EnsureCreated();
-    DbInitializer.Initialize(context);
+    context.Database.Migrate();
+    
+    var env = services.GetRequiredService<IHostEnvironment>();
+    if (env.IsDevelopment())
+        DbInitializer.Initialize(context);
 }
 
-// try to run it on local network
 app.UseHttpsRedirection();
 
 app.UseRouting();
 app.UseCors("AllowSpecificOrigins");
 app.UseAuthorization();
-
 
 app.MapControllers();
 

@@ -10,8 +10,11 @@
 *.userosscache
 *.sln.docstates
 
-!.env.template
+# Ignore all .env files
 .env*
+# Except this
+!.env.template
+
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

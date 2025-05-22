@@ -26,4 +26,7 @@ README.md
 !.git/packed-refs
 !.git/refs/heads/**
 
+# Ignore all .env files
 .env*
+# except this one
+!.env.production
