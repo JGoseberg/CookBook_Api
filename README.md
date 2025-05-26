@@ -1,11 +1,12 @@
 # Introduction
 This is the API for the selfhosted Cookbook, build with C# and Entity Framework.
 If you want to see the Frontend build with React and TypeScript please visit 
-https://github.com/JGoseberg/CookBook_React.
+[CookBook React App](https://github.com/JGoseberg/CookBook_React).
 
 # Features
 - Dockerized
 - CI/CD Based
+- includes a Postgres Database
 
 # Getting Started
 ## Self-hosted
@@ -32,4 +33,6 @@ cookbook-api:latest
 # Roadmap
 ## 05/2025
 - Development started
+- basic CI/CD included
+- first Database included
 
