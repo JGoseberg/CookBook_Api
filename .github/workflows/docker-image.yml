@@ -9,6 +9,14 @@ jobs:
   deploy:
     runs-on: self-hosted
 
+    env:
+      DB_ConnectionString: ${{DB_ConnectionString}}
+      ASPNETCORE_ENVIRONMENT: ${{ASPNETCORE_ENVIRONMENT}}
+      API_PORT: ${{API_PORT}}
+      DB_USER: ${{DB_USER}}
+      DB_PASSWORD: ${{DB_PASSWORD}}
+      DB_NAME: ${{DB_NAME}}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
