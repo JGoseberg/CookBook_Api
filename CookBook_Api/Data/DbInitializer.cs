@@ -14,8 +14,8 @@ namespace CookBook_Api.Data
 
             var recipes = new Recipe[]
             {
-                new Recipe{Name="Schinkennudeln"},
-                new Recipe{Name="Schweinemedaillons"},
+                new Recipe{Name="Schinkennudeln", Uri=new Uri("https://duckduckgo.com/")},
+                new Recipe{Name="Schweinemedaillons", Description="test"},
             };
 
             context.Recipes.AddRange(recipes);

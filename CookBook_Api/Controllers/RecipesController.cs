@@ -21,10 +21,10 @@ namespace CookBook_Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Recipe>>> GetAllRecipes()
         {
-            var recipes = await _recipeRepository.GetAllRecipesAsync();
+            var recipesDtos = await _recipeRepository.GetAllRecipesAsync();
 
-            var test = _mapper.Map<IEnumerable<Recipe>>(recipes);
-            return Ok(test);
+            var recipes = _mapper.Map<IEnumerable<Recipe>>(recipesDtos);
+            return Ok(recipes);
             
         }
     }
