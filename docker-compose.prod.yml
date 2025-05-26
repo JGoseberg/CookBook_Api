@@ -20,7 +20,7 @@ services:
     container_name: cookbook-api
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
-      DB_ConnectionString__DefaultConnection: ${DB_ConnectionString}
+      DB_ConnectionString__DefaultConnection: ${DB_ConnectionString__DefaultConnection}
     ports:
       - "${API_PORT}:8080"
     depends_on:
