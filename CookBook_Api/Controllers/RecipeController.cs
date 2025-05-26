@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using CookBook_Api.DTOs;
 using CookBook_Api.Interfaces;
 using CookBook_Api.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CookBook_Api.Controllers
 {
     [ApiController]
-    [Route("/api/")]
+    [Route("/api/[controller]/[action]")]
     public class RecipeController : ControllerBase
     {
         private readonly IRecipeRepository _recipeRepository;

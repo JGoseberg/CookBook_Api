@@ -1,11 +1,11 @@
-﻿using CookBook_Api.Controllers;
-using CookBook_Api.Interfaces;
+﻿using AutoMapper;
+using CookBook_Api.Controllers;
 using CookBook_Api.DTOs;
-using AutoMapper;
+using CookBook_Api.Interfaces;
 using CookBook_Api.Mappings;
-using Moq;
-using Microsoft.AspNetCore.Mvc;
 using CookBook_Api.Models;
+using Microsoft.AspNetCore.Mvc;
+using Moq;
 
 namespace CookBook_Api.Tests.Cotrollers
 {
