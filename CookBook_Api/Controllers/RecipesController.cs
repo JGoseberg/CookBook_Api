@@ -7,12 +7,12 @@ namespace CookBook_Api.Controllers
 {
     [ApiController]
     [Route("/api/[controller]/[action]")]
-    public class RecipeController : ControllerBase
+    public class RecipesController : ControllerBase
     {
         private readonly IRecipeRepository _recipeRepository;
         private readonly IMapper _mapper;
 
-        public RecipeController(IRecipeRepository recipeRepository, IMapper mapper)
+        public RecipesController(IRecipeRepository recipeRepository, IMapper mapper)
         {
             _recipeRepository = recipeRepository;
             _mapper = mapper;

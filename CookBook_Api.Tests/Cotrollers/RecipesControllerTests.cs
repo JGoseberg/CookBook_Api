@@ -10,19 +10,19 @@ using Moq;
 namespace CookBook_Api.Tests.Cotrollers
 {
     [TestFixture]
-    public class RecipeControllerTests
+    public class RecipesControllerTests
     {
         private Mock<IRecipeRepository> _recipeRepositoryMock;
         private IMapper _mapper;
 
-        private RecipeController _controller;
+        private RecipesController _controller;
 
         [SetUp]
         public void Setup()
         {
             _recipeRepositoryMock = new Mock<IRecipeRepository>();
             _mapper = MapperConfig.InitializeAutoMapper();
-            _controller = new RecipeController(_recipeRepositoryMock.Object, _mapper);
+            _controller = new RecipesController(_recipeRepositoryMock.Object, _mapper);
         }
 
         [Test]
