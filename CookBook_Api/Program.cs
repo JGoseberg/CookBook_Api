@@ -2,11 +2,10 @@ using CookBook_Api.Data;
 using CookBook_Api.Interfaces;
 using CookBook_Api.Mappings;
 using CookBook_Api.Repositories;
+using dotenv.net;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-
-
 
 builder.Services.AddCors(opt =>
 {
@@ -33,10 +32,15 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<CookBookContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
+// Db Config
+var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
+DotEnv.Load(options: new DotEnvOptions(envFilePaths: [$".env.{environment}"]));
+
+var connectionString = Environment.GetEnvironmentVariable("DefaultConnection");
+
+builder.Services.AddDbContext<CookBookContext>(options => 
+    options.UseNpgsql(connectionString));
 
 builder.WebHost.ConfigureKestrel(serveroption =>
 {
