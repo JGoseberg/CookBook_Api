@@ -30,5 +30,4 @@ COPY --from=publish /app/publish .
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
-
-#ENTRYPOINT ["dotnet", "CookBook_Api.dll"]
+ENTRYPOINT ["/entrypoint.sh"]
