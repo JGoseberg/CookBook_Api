@@ -8,6 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: self-hosted
+    environment: Production
 
     env:
       CONNECTIONSTRING__DEFAULTCONNECTION: ${{secrets.CONNECTIONSTRING__DEFAULTCONNECTION}}
