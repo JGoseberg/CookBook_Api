@@ -34,13 +34,14 @@ builder.Services.AddSwaggerGen();
 
 // Db Config
 var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+Console.WriteLine($"env: {environment}");
 
 DotEnv.Load(options: new DotEnvOptions(envFilePaths: [$".env.{environment}"]));
 
 var connectionString = Environment.GetEnvironmentVariable("CONNECTIONSTRING__DEFAULTCONNECTION");
 
 //debuggin step
-Console.WriteLine($"Connection string: {connectionString ?? "null"}");
+Console.WriteLine($"Connection string: {connectionString}");
 
 builder.Services.AddDbContext<CookBookContext>(options => 
     options.UseNpgsql(connectionString));
