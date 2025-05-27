@@ -28,6 +28,7 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-CMD ["sh", "-c", "printenv > /env_dump_at_runtime.txt && sleep infinity"]
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-ENTRYPOINT ["dotnet", "CookBook_Api.dll"]
+#ENTRYPOINT ["dotnet", "CookBook_Api.dll"]
