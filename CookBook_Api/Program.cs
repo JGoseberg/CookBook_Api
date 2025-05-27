@@ -37,7 +37,7 @@ var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
 DotEnv.Load(options: new DotEnvOptions(envFilePaths: [$".env.{environment}"]));
 
-var connectionString = Environment.GetEnvironmentVariable("DefaultConnection");
+var connectionString = Environment.GetEnvironmentVariable("ConnectionString__DefaultConnection");
 
 builder.Services.AddDbContext<CookBookContext>(options => 
     options.UseNpgsql(connectionString));
