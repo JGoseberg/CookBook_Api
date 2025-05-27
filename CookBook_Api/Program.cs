@@ -46,11 +46,6 @@ Console.WriteLine($"Connection string: {connectionString}");
 builder.Services.AddDbContext<CookBookContext>(options => 
     options.UseNpgsql(connectionString));
 
-builder.WebHost.ConfigureKestrel(serveroption =>
-{
-    serveroption.ListenAnyIP(5046);
-});
-
 builder.Services.AddAutoMapper(typeof(RecipeProfile));
 
 var app = builder.Build();
