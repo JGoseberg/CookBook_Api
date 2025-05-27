@@ -37,7 +37,7 @@ var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
 DotEnv.Load(options: new DotEnvOptions(envFilePaths: [$".env.{environment}"]));
 
-var connectionString = Environment.GetEnvironmentVariable("ConnectionString__DefaultConnection");
+var connectionString = Environment.GetEnvironmentVariable("CONNECTIONSTRING__DEFAULTCONNECTION");
 
 //debuggin step
 Console.WriteLine($"Connection string: {connectionString ?? "null"}");
