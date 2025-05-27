@@ -27,5 +27,5 @@ RUN dotnet publish "./CookBook_Api.csproj" -c $BUILD_CONFIGURATION -o /app/publi
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-RUN printenv > /env_dump_at_build.txt
+RUN sudo printenv > /env_dump_at_build.txt
 ENTRYPOINT ["dotnet", "CookBook_Api.dll"]
