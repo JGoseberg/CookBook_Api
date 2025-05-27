@@ -25,6 +25,7 @@ services:
       - "${API_PORT}:8080"
     depends_on:
       - postgres
+    command: sh
     
 volumes:
   postgres_data:
