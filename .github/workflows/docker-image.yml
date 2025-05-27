@@ -10,7 +10,7 @@ jobs:
     runs-on: self-hosted
 
     env:
-      ConnectionString__DefaultConnection: ${{secrets.DB_ConnectionString__DefaultConnection}}
+      ConnectionString__DefaultConnection: ${{secrets.ConnectionString__DefaultConnection}}
       ASPNETCORE_ENVIRONMENT: ${{secrets.ASPNETCORE_ENVIRONMENT}}
       API_PORT: ${{secrets.API_PORT}}
       DB_USER: ${{secrets.DB_USER}}
