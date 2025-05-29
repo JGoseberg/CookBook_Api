@@ -1,4 +1,4 @@
-name: Run Tests of Feature Branches
+name: Run Tests of feature Branches
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
       - Feature/**
 
 jobs:
-  test:
+  feature-tests:
     runs-on: self-hosted
     steps:
       - name: Checkout Code
