@@ -14,4 +14,4 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build Docker image and run Unittests
-        run: docker-build -f Dockerfile.test . || exit 1
+        run: docker build -f Dockerfile.test . || exit 1
