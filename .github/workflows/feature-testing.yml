@@ -1,0 +1,27 @@
+name: Run Tests of Feature Branches
+
+on:
+  push:
+    branches:
+      - feature/**
+
+jobs:
+  test:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore
+
+      - name: Run Unit Tests
+        run: dotnet test --no-build --verbosity normal
