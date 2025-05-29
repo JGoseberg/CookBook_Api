@@ -99,14 +99,5 @@ namespace CookBook_Api.Tests.Cotrollers
                 Assert.That(specificRecipe?.Uri, Is.EqualTo(recipes[0].Uri));
             });
         }
-
-
-        [Test]
-        public async Task ShouldFail()
-        {
-            var result = 1;
-
-            Assert.That(result, Is.EqualTo(2));
-        }
     }
 }
