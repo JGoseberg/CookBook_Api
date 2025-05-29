@@ -19,6 +19,7 @@ namespace CookBook_Api.Controllers
             _mapper = mapper;
         }
 
+
         [HttpPost]
         public async Task<ActionResult> AddRecipe([FromBody]AddRecipeDTO addRecipe)
         {
@@ -34,6 +35,7 @@ namespace CookBook_Api.Controllers
 
             return Created("", recipe);
         }
+
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Recipe>>> GetAllRecipes()
