@@ -1,0 +1,7 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS test
+
+WORKDIR /app
+COPY . .
+
+RUN dotnet restore
+RUN dotnet test --no-restore --verbosity normal

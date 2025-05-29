@@ -1,15 +1,9 @@
 ﻿using AutoMapper;
 using CookBook_Api.Data;
-using CookBook_Api.DTOs;
 using CookBook_Api.Mappings;
 using CookBook_Api.Models;
 using CookBook_Api.Repositories;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CookBook_Api.Tests.Repositories
 {
@@ -25,6 +19,7 @@ namespace CookBook_Api.Tests.Repositories
             new Recipe {Name="Bar"},
         };
 
+
         [SetUp]
         public void Setup()
         {
@@ -35,26 +30,73 @@ namespace CookBook_Api.Tests.Repositories
             _mapper = MapperConfig.InitializeAutoMapper();
         }
 
+
         [TearDown]
-        public void Teardown() 
+        public void Teardown()
         {
             using var context = new CookBookContext(_contextOptions);
             context.Database.EnsureDeleted();
         }
+
+
+        [Test]
+        public async Task AddRecipeAsync_ShouldBeAddedInDatabase()
+        {
+            var recipeToAdd = new Recipe { Name = "Foo", Description = "Bar", Uri = new Uri("http://foobar.com") };
+
+            await using var context = new CookBookContext(_contextOptions);
+
+            var repository = new RecipeRepository(context, _mapper);
+
+            await repository.AddRecipeAsync(recipeToAdd);
+
+            var result = await context.Recipes.FirstOrDefaultAsync();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result?.Id, Is.EqualTo(1));
+                Assert.That(result, Is.EqualTo(recipeToAdd));
+            });
+        }
+
 
         [Test]
         public async Task GetAllRecipesAsync_ShouldReturnAllRecipes()
         {
             await using var context = new CookBookContext(_contextOptions);
 
+            var repository = new RecipeRepository(context, _mapper);
+
             await context.Recipes.AddRangeAsync(_recipes);
             await context.SaveChangesAsync();
-
-            var repository = new RecipeRepository(context, _mapper);
 
             var recipes = await repository.GetAllRecipesAsync();
 
             Assert.That(recipes.Select(r => r.Name), Is.EquivalentTo(_recipes.Select(r => r.Name)));
+        }
+
+
+        [Test]
+        public async Task GetRecipeByIdAsync_ShouldReturnRecipe()
+        {
+            await using var context = new CookBookContext(_contextOptions);
+
+            var repository = new RecipeRepository(context, _mapper);
+
+            var recipe = new Recipe { Name = "Foo", Description = "Bar", Uri = new Uri("http://foobar.com") };
+
+            await repository.AddRecipeAsync(recipe);
+            await context.SaveChangesAsync();
+
+            var result = await repository.GetRecipeByIdAsync(1);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result.Name, Is.EqualTo(recipe.Name));
+                Assert.That(result.Description, Is.EqualTo(recipe.Description));
+                Assert.That(result.Uri, Is.EqualTo(recipe.Uri));
+            });
         }
     }
 }

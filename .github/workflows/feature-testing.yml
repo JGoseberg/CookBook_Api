@@ -1,4 +1,4 @@
-name: Run Tests of Feature Branches
+name: Run Tests of feature Branches
 
 on:
   push:
@@ -7,22 +7,11 @@ on:
       - Feature/**
 
 jobs:
-  test:
+  feature-tests:
     runs-on: self-hosted
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 8.0
-
-      - name: Restore dependencies
-        run: dotnet restore
-
-      - name: Build
-        run: dotnet build --no-restore
-
-      - name: Run Unit Tests
-        run: dotnet test --no-build --verbosity normal
+      - name: Build Docker image and run Unittests
+        run: docker build -f Dockerfile.test . || exit 1

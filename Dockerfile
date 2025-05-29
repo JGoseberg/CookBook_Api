@@ -15,6 +15,7 @@ WORKDIR /src
 COPY ["CookBook_Api/CookBook_Api.csproj", "CookBook_Api/"]
 RUN dotnet restore "./CookBook_Api/CookBook_Api.csproj"
 COPY . .
+RUN dotnet test --no-restore --verbosity normal
 WORKDIR "/src/CookBook_Api"
 RUN dotnet build "./CookBook_Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 

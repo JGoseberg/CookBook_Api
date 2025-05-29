@@ -1,5 +1,5 @@
 using CookBook_Api.Data;
-using CookBook_Api.Interfaces;
+using CookBook_Api.Interfaces.IRepositories;
 using CookBook_Api.Mappings;
 using CookBook_Api.Repositories;
 using dotenv.net;
