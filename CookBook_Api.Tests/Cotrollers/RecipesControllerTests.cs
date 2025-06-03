@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CookBook_Api.Common;
+using CookBook_Api.Common.ErrorHandling;
 using CookBook_Api.Controllers;
 using CookBook_Api.DTOs;
 using CookBook_Api.Interfaces.IRepositories;
@@ -123,17 +124,20 @@ namespace CookBook_Api.Tests.Cotrollers
         public async Task GetRecipeById_ShouldReturnNotFound()
         {
             _recipeRepositoryMock.Setup(r => r.GetRecipeByIdAsync(It.IsAny<int>()))
-                .ReturnsAsync(Result<RecipeDTO>.Fail(Error.RecipeNotFound));
+                .ReturnsAsync(Result<RecipeDTO>.Fail(ErrorMessages.RecipeNotFound));
 
             var result = await _controller.GetRecipeById(It.IsAny<int>());
 
             var resultObject = result.Result as NotFoundObjectResult;
 
+            var error = resultObject?.Value as ErrorResponse;
+
             Assert.Multiple(() =>
             {
                 Assert.That(result, Is.Not.Null);
                 Assert.That(resultObject?.StatusCode, Is.EqualTo(404));
-                Assert.That(resultObject?.Value, Is.EqualTo("Recipe could not be found"));
+                Assert.That(error?.Code, Is.EqualTo(ErrorMessages.RecipeNotFound.Code));
+                Assert.That(error?.Message, Is.EqualTo(ErrorMessages.RecipeNotFound.Message));
             });
         }
     }

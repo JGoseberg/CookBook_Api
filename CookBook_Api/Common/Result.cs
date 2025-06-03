@@ -1,4 +1,6 @@
-﻿namespace CookBook_Api.Common
+﻿using CookBook_Api.Common.ErrorHandling;
+
+namespace CookBook_Api.Common
 {
     public class Result<T>
     {

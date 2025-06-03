@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CookBook_Api.Common;
+using CookBook_Api.Common.ErrorHandling;
 using CookBook_Api.Data;
 using CookBook_Api.DTOs;
 using CookBook_Api.Interfaces.IRepositories;
@@ -40,7 +41,7 @@ namespace CookBook_Api.Repositories
             var recipe = await _context.Recipes.FirstOrDefaultAsync(x => x.Id == id);
 
             if (recipe == null)
-                return Result<RecipeDTO>.Fail(Error.RecipeNotFound);
+                return Result<RecipeDTO>.Fail(ErrorMessages.RecipeNotFound);
 
             return Result<RecipeDTO>.Success(_mapper.Map<RecipeDTO>(recipe));
         }

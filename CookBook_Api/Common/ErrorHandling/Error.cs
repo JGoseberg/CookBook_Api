@@ -1,6 +1,4 @@
-﻿using CookBook_Api.Models;
-
-namespace CookBook_Api.Common
+﻿namespace CookBook_Api.Common.ErrorHandling
 {
     public class Error
     {
@@ -12,7 +10,5 @@ namespace CookBook_Api.Common
             Code = code;
             Message = message;
         }
-
-        public static Error RecipeNotFound = new("RECIPE_NOT_FOUND", "Recipe could not be found.");
     }
 }

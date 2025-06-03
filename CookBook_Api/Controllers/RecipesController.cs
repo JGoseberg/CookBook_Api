@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CookBook_Api.Common.ErrorHandling;
 using CookBook_Api.DTOs;
 using CookBook_Api.Interfaces.IRepositories;
 using CookBook_Api.Models;
@@ -56,7 +57,7 @@ namespace CookBook_Api.Controllers
             var recipe = await _recipeRepository.GetRecipeByIdAsync(id);
 
             if (!recipe.IsSuccess)
-                return NotFound(new {code = recipe.Error!.Code, message = recipe.Error.Message });
+                return NotFound(ErrorResponse.CreateFromError(recipe.Error!));
 
             return Ok(recipe.Value);
         }
