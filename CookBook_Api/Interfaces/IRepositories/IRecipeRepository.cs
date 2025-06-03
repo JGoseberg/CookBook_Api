@@ -1,4 +1,5 @@
-﻿using CookBook_Api.DTOs;
+﻿using CookBook_Api.Common;
+using CookBook_Api.DTOs;
 using CookBook_Api.Models;
 
 namespace CookBook_Api.Interfaces.IRepositories
@@ -7,6 +8,6 @@ namespace CookBook_Api.Interfaces.IRepositories
     {
         Task AddRecipeAsync(Recipe recipeDTO);
         Task<IEnumerable<RecipeDTO>> GetAllRecipesAsync();
-        Task<RecipeDTO> GetRecipeByIdAsync(int id);
+        Task<Result<RecipeDTO>> GetRecipeByIdAsync(int id);
     }
 }

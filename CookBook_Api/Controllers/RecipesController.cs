@@ -46,5 +46,19 @@ namespace CookBook_Api.Controllers
 
             return Ok(recipes);
         }
+
+        [HttpGet]
+        public async Task<ActionResult<RecipeDTO>> GetRecipeById(int id)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            var recipe = await _recipeRepository.GetRecipeByIdAsync(id);
+
+            if (!recipe.IsSuccess)
+                return NotFound(recipe.ErrorMessage);
+
+            return Ok(recipe.Value);
+        }
     }
 }
