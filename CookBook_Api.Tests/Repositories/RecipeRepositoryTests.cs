@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CookBook_Api.Common;
 using CookBook_Api.Data;
 using CookBook_Api.Mappings;
 using CookBook_Api.Models;
@@ -92,9 +93,9 @@ namespace CookBook_Api.Tests.Repositories
 
             Assert.Multiple(() =>
             {
-                Assert.That(result?.Value?.Name, Is.EqualTo(recipe.Name));
-                Assert.That(result?.Value?.Description, Is.EqualTo(recipe.Description));
-                Assert.That(result?.Value?.Uri, Is.EqualTo(recipe.Uri));
+                Assert.That(result!.Value!.Name, Is.EqualTo(recipe.Name));
+                Assert.That(result!.Value!.Description, Is.EqualTo(recipe.Description));
+                Assert.That(result!.Value!.Uri, Is.EqualTo(recipe.Uri));
             });
         }
 
@@ -115,7 +116,7 @@ namespace CookBook_Api.Tests.Repositories
             Assert.Multiple(() =>
             {
                 Assert.That(result, Is.Not.Null);
-                Assert.That(result?.ErrorMessage, Is.EqualTo("Recipe could not be found"));
+                Assert.That(result?.Error, Is.EqualTo(Error.RecipeNotFound));
             });
         }
     }

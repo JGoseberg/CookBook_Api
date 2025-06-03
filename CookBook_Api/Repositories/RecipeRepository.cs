@@ -40,7 +40,7 @@ namespace CookBook_Api.Repositories
             var recipe = await _context.Recipes.FirstOrDefaultAsync(x => x.Id == id);
 
             if (recipe == null)
-                return Result<RecipeDTO>.Fail("Recipe could not be found");
+                return Result<RecipeDTO>.Fail(Error.RecipeNotFound);
 
             return Result<RecipeDTO>.Success(_mapper.Map<RecipeDTO>(recipe));
         }

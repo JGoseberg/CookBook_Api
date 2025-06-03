@@ -56,7 +56,7 @@ namespace CookBook_Api.Controllers
             var recipe = await _recipeRepository.GetRecipeByIdAsync(id);
 
             if (!recipe.IsSuccess)
-                return NotFound(recipe.ErrorMessage);
+                return NotFound(new {code = recipe.Error!.Code, message = recipe.Error.Message });
 
             return Ok(recipe.Value);
         }

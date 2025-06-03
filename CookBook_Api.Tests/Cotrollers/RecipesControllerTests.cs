@@ -123,7 +123,7 @@ namespace CookBook_Api.Tests.Cotrollers
         public async Task GetRecipeById_ShouldReturnNotFound()
         {
             _recipeRepositoryMock.Setup(r => r.GetRecipeByIdAsync(It.IsAny<int>()))
-                .ReturnsAsync(Result<RecipeDTO>.Fail("Recipe could not be found"));
+                .ReturnsAsync(Result<RecipeDTO>.Fail(Error.RecipeNotFound));
 
             var result = await _controller.GetRecipeById(It.IsAny<int>());
 
