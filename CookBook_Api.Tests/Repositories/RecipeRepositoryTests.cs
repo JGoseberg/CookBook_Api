@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CookBook_Api.Common.ErrorHandling;
 using CookBook_Api.Data;
 using CookBook_Api.Mappings;
 using CookBook_Api.Models;
@@ -83,19 +84,39 @@ namespace CookBook_Api.Tests.Repositories
 
             var repository = new RecipeRepository(context, _mapper);
 
-            var recipe = new Recipe { Name = "Foo", Description = "Bar", Uri = new Uri("http://foobar.com") };
+            var recipe = new Recipe { Id=1, Name = "Foo", Description = "Bar", Uri = new Uri("http://foobar.com") };
 
             await repository.AddRecipeAsync(recipe);
             await context.SaveChangesAsync();
 
-            var result = await repository.GetRecipeByIdAsync(1);
+            var result = await repository.GetRecipeByIdAsync(recipe.Id);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result!.Value!.Name, Is.EqualTo(recipe.Name));
+                Assert.That(result!.Value!.Description, Is.EqualTo(recipe.Description));
+                Assert.That(result!.Value!.Uri, Is.EqualTo(recipe.Uri));
+            });
+        }
+
+        [Test]
+        public async Task GetRecipeByIdAsync_ShouldReturnNotFound()
+        {
+            await using var context = new CookBookContext(_contextOptions);
+
+            var repository = new RecipeRepository(context, _mapper);
+
+            var recipe = new Recipe { Id = 1, Name = "Foo", Description = "Bar", Uri = new Uri("http://foobar.com") };
+
+            await repository.AddRecipeAsync(recipe);
+            await context.SaveChangesAsync();
+
+            var result = await repository.GetRecipeByIdAsync(404);
 
             Assert.Multiple(() =>
             {
                 Assert.That(result, Is.Not.Null);
-                Assert.That(result.Name, Is.EqualTo(recipe.Name));
-                Assert.That(result.Description, Is.EqualTo(recipe.Description));
-                Assert.That(result.Uri, Is.EqualTo(recipe.Uri));
+                Assert.That(result?.Error, Is.EqualTo(ErrorMessages.RecipeNotFound));
             });
         }
     }

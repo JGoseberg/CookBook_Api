@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CookBook_Api.Common.ErrorHandling;
 using CookBook_Api.DTOs;
 using CookBook_Api.Interfaces.IRepositories;
 using CookBook_Api.Models;
@@ -45,6 +46,20 @@ namespace CookBook_Api.Controllers
             var recipes = _mapper.Map<IEnumerable<Recipe>>(recipesDtos);
 
             return Ok(recipes);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<RecipeDTO>> GetRecipeById(int id)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            var recipe = await _recipeRepository.GetRecipeByIdAsync(id);
+
+            if (!recipe.IsSuccess)
+                return NotFound(ErrorResponse.CreateFromError(recipe.Error!));
+
+            return Ok(recipe.Value);
         }
     }
 }
