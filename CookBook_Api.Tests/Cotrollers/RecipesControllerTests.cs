@@ -1,11 +1,10 @@
 ﻿using AutoMapper;
+using CookBook_Api.Common;
 using CookBook_Api.Controllers;
 using CookBook_Api.DTOs;
 using CookBook_Api.Interfaces.IRepositories;
 using CookBook_Api.Mappings;
 using CookBook_Api.Models;
-using CookBook_Api.Repositories;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 
@@ -48,7 +47,7 @@ namespace CookBook_Api.Tests.Cotrollers
             });
         }
 
-        [Test] 
+        [Test]
         public async Task AddRecipeWithWrongUriShouldReturnCreated()
         {
             var recipeToAdd = new AddRecipeDTO { Name = "Foo", Description = "Bar", Uri = "foobar" };
@@ -97,6 +96,44 @@ namespace CookBook_Api.Tests.Cotrollers
                 Assert.That(specificRecipe?.Name, Is.EqualTo(recipes[0].Name));
                 Assert.That(specificRecipe?.Description, Is.EqualTo(recipes[0].Description));
                 Assert.That(specificRecipe?.Uri, Is.EqualTo(recipes[0].Uri));
+            });
+        }
+
+        [Test]
+        public async Task GetRecipeById_ShouldReturnOk()
+        {
+            var recipe = new RecipeDTO { Id = 1, Name = "Foo", Description = "Bar", Uri = new Uri("http://foobar.com") };
+
+            _recipeRepositoryMock.Setup(r => r.GetRecipeByIdAsync(It.IsAny<int>()))
+                .ReturnsAsync(Result<RecipeDTO>.Success(recipe));
+
+            var result = await _controller.GetRecipeById(recipe.Id);
+
+            var resultValue = result.Result as OkObjectResult;
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Result, Is.Not.Null);
+                           
+                Assert.That(resultValue?.Value, Is.EqualTo(recipe));
+            });
+        }
+
+        [Test]
+        public async Task GetRecipeById_ShouldReturnNotFound()
+        {
+            _recipeRepositoryMock.Setup(r => r.GetRecipeByIdAsync(It.IsAny<int>()))
+                .ReturnsAsync(Result<RecipeDTO>.Fail("Recipe could not be found"));
+
+            var result = await _controller.GetRecipeById(It.IsAny<int>());
+
+            var resultObject = result.Result as NotFoundObjectResult;
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.Not.Null);
+                Assert.That(resultObject?.StatusCode, Is.EqualTo(404));
+                Assert.That(resultObject?.Value, Is.EqualTo("Recipe could not be found"));
             });
         }
     }
