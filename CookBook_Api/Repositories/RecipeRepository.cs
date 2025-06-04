@@ -21,10 +21,28 @@ namespace CookBook_Api.Repositories
         }
 
 
-        public async Task AddRecipeAsync(Recipe recipe)
+        public async Task<Result<RecipeDTO>> AddRecipeAsync(AddRecipeDTO addRecipe)
         {
+            var recipe = new Recipe
+            {
+                Name = addRecipe.Name,
+                Description = addRecipe.Description
+            };
+
+            if (!string.IsNullOrWhiteSpace(addRecipe.Uri))
+            {
+                if (!Uri.TryCreate(addRecipe.Uri, UriKind.Absolute, out var recipeUri) ||
+                (recipeUri.Scheme != Uri.UriSchemeHttp && recipeUri.Scheme != Uri.UriSchemeHttps))
+                {
+                    return Result<RecipeDTO>.Fail(ErrorMessages.InvalidUri);
+                }
+                recipe.Uri = recipeUri;
+            }                
+
             await _context.Recipes.AddAsync(recipe);
             await _context.SaveChangesAsync();
+
+            return Result<RecipeDTO>.Success(_mapper.Map<RecipeDTO>(recipe));
         }
 
 

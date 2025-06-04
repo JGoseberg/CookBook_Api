@@ -27,8 +27,9 @@ namespace CookBook_Api.Tests.Cotrollers
             _controller = new RecipesController(_recipeRepositoryMock.Object, _mapper);
         }
 
-        [Test]
-        public async Task AddRecipeShouldReturnCreated()
+        [TestCase("http://example.com")]
+        [TestCase("https://example.com")]
+        public async Task AddRecipeShouldReturnCreated(string uri)
         {
             var recipeToAdd = new AddRecipeDTO { Name = "Foo", Description = "Bar", Uri = "http://foobar.com" };
 
@@ -55,17 +56,14 @@ namespace CookBook_Api.Tests.Cotrollers
 
             var result = await _controller.AddRecipe(recipeToAdd);
 
+            var resultObject = result as BadRequestObjectResult;
+            
+            
             Assert.Multiple(() =>
             {
-                var okResult = result as CreatedResult;
+                Assert.That(resultObject?.StatusCode, Is.EqualTo(400));
 
-                Assert.That(okResult, Is.Not.Null);
-
-                var recipeResult = okResult?.Value as Recipe;
-
-                Assert.That(recipeResult?.Name, Is.EqualTo(recipeToAdd.Name));
-                Assert.That(recipeResult?.Description, Is.EqualTo(recipeToAdd.Description));
-                Assert.That(recipeResult?.Uri, Is.Null);
+                Assert.That(resultObject?.Value, Is.EqualTo(ErrorMessages.InvalidUri));
             });
         }
 

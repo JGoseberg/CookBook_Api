@@ -6,7 +6,7 @@ namespace CookBook_Api.Interfaces.IRepositories
 {
     public interface IRecipeRepository
     {
-        Task AddRecipeAsync(Recipe recipeDTO);
+        Task<Result<RecipeDTO>> AddRecipeAsync(AddRecipeDTO addRecipeDTO);
         Task<IEnumerable<RecipeDTO>> GetAllRecipesAsync();
         Task<Result<RecipeDTO>> GetRecipeByIdAsync(int id);
     }

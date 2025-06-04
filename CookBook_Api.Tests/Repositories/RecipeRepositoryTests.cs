@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using CookBook_Api.Common.ErrorHandling;
 using CookBook_Api.Data;
+using CookBook_Api.DTOs;
 using CookBook_Api.Mappings;
 using CookBook_Api.Models;
 using CookBook_Api.Repositories;
@@ -40,10 +41,11 @@ namespace CookBook_Api.Tests.Repositories
         }
 
 
-        [Test]
-        public async Task AddRecipeAsync_ShouldBeAddedInDatabase()
+        [TestCase("http://example.com")]
+        [TestCase("https://example.com")]
+        public async Task AddRecipeAsync_ShouldBeAddedInDatabase(string uri)
         {
-            var recipeToAdd = new Recipe { Name = "Foo", Description = "Bar", Uri = new Uri("http://foobar.com") };
+            var recipeToAdd = new AddRecipeDTO { Name = "Foo", Description = "Bar", Uri = uri };
 
             await using var context = new CookBookContext(_contextOptions);
 
@@ -51,12 +53,37 @@ namespace CookBook_Api.Tests.Repositories
 
             await repository.AddRecipeAsync(recipeToAdd);
 
+            var expectedUri = new Uri(uri);
             var result = await context.Recipes.FirstOrDefaultAsync();
 
             Assert.Multiple(() =>
             {
                 Assert.That(result?.Id, Is.EqualTo(1));
-                Assert.That(result, Is.EqualTo(recipeToAdd));
+                Assert.That(result?.Name, Is.EqualTo(recipeToAdd.Name));
+                Assert.That(result?.Description, Is.EqualTo(recipeToAdd.Description));
+                Assert.That(result?.Uri, Is.EqualTo(expectedUri));
+            });
+        }
+
+        [TestCase("ftp://example.com")]
+        [TestCase("example.com")]
+        public async Task AddRecipeAsync_ShouldNotBeAddedInDatabase(string uri)
+        {
+            var recipeToAdd = new AddRecipeDTO { Name = "Foo", Description = "Bar", Uri = uri };
+
+            await using var context = new CookBookContext(_contextOptions);
+
+            var repository = new RecipeRepository(context, _mapper);
+
+            var result = await repository.AddRecipeAsync(recipeToAdd);
+
+            var recipeInDb = await context.Recipes.FirstOrDefaultAsync();
+
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(recipeInDb, Is.Null);
+                Assert.That(result.Error, Is.EqualTo(ErrorMessages.InvalidUri));
             });
         }
 

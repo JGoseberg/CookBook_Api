@@ -22,22 +22,20 @@ namespace CookBook_Api.Controllers
 
 
         [HttpPost]
-        public async Task<ActionResult> AddRecipe([FromBody]AddRecipeDTO addRecipe)
+        public async Task<ActionResult> AddRecipe([FromBody] AddRecipeDTO addRecipe)
         {
-            if (!ModelState.IsValid) 
+            if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var recipe = new Recipe { Name = addRecipe.Name, Description = addRecipe.Description };
-            
-            if (Uri.TryCreate(addRecipe.Uri, UriKind.Absolute, out var recipeUri))
-                recipe.Uri = recipeUri;
+            var result = await _recipeRepository.AddRecipeAsync(addRecipe);
 
-            await _recipeRepository.AddRecipeAsync(recipe);
+            if (!result.IsSuccess)
+                return BadRequest(ErrorResponse.CreateFromError(result.Error!));
 
-            return Created("", recipe);
+            return Created("", result.Value);
         }
 
-
+        // TODO Delete(id)
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Recipe>>> GetAllRecipes()
         {
@@ -61,5 +59,7 @@ namespace CookBook_Api.Controllers
 
             return Ok(recipe.Value);
         }
+
+        // TODO UpdateRecipe (id, recipe)
     }
 }
