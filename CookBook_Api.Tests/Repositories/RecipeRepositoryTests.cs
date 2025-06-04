@@ -6,6 +6,7 @@ using CookBook_Api.Mappings;
 using CookBook_Api.Models;
 using CookBook_Api.Repositories;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace CookBook_Api.Tests.Repositories
 {
@@ -111,18 +112,21 @@ namespace CookBook_Api.Tests.Repositories
 
             var repository = new RecipeRepository(context, _mapper);
 
-            var recipe = new Recipe { Id=1, Name = "Foo", Description = "Bar", Uri = new Uri("http://foobar.com") };
+            var uri = "http://foobar.com";
+
+            var recipe = new AddRecipeDTO { Name = "Foo", Description = "Bar", Uri = uri };
 
             await repository.AddRecipeAsync(recipe);
             await context.SaveChangesAsync();
 
-            var result = await repository.GetRecipeByIdAsync(recipe.Id);
+            var expectedUri = new Uri("http://foobar.com");
+            var result = await repository.GetRecipeByIdAsync(1);
 
             Assert.Multiple(() =>
             {
                 Assert.That(result!.Value!.Name, Is.EqualTo(recipe.Name));
                 Assert.That(result!.Value!.Description, Is.EqualTo(recipe.Description));
-                Assert.That(result!.Value!.Uri, Is.EqualTo(recipe.Uri));
+                Assert.That(result!.Value!.Uri, Is.EqualTo(expectedUri));
             });
         }
 
@@ -133,7 +137,7 @@ namespace CookBook_Api.Tests.Repositories
 
             var repository = new RecipeRepository(context, _mapper);
 
-            var recipe = new Recipe { Id = 1, Name = "Foo", Description = "Bar", Uri = new Uri("http://foobar.com") };
+            var recipe = new AddRecipeDTO { Name = "Foo", Description = "Bar", Uri = "http://foobar.com" };
 
             await repository.AddRecipeAsync(recipe);
             await context.SaveChangesAsync();
