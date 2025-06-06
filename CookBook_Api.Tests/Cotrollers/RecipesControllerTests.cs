@@ -31,39 +31,53 @@ namespace CookBook_Api.Tests.Cotrollers
         [TestCase("https://example.com")]
         public async Task AddRecipeShouldReturnCreated(string uri)
         {
-            var recipeToAdd = new AddRecipeDTO { Name = "Foo", Description = "Bar", Uri = "http://foobar.com" };
+            var recipeToAdd = new AddRecipeDTO { Name = "Foo", Description = "Bar", Uri = uri };
+
+            var expectedRecipe = new RecipeDTO { Id = 1, Name = "Foo", Description = "Bar", Uri = new Uri(uri) };
+
+            _recipeRepositoryMock.Setup(r => r.AddRecipeAsync(recipeToAdd))
+                .ReturnsAsync(Result<RecipeDTO>.Success(expectedRecipe));
 
             var result = await _controller.AddRecipe(recipeToAdd);
+            var createdResult = result as CreatedResult;
+            var recipeDTO = createdResult?.Value as RecipeDTO;
 
             Assert.Multiple(() =>
             {
-                var okResult = result as CreatedResult;
+                Assert.That(createdResult, Is.Not.Null);
+                Assert.That(createdResult?.StatusCode, Is.EqualTo(201));
 
-                Assert.That(okResult, Is.Not.Null);
-
-                var recipeResult = okResult?.Value as Recipe;
-
-                Assert.That(recipeResult?.Name, Is.EqualTo(recipeToAdd.Name));
-                Assert.That(recipeResult?.Description, Is.EqualTo(recipeToAdd.Description));
-                Assert.That(recipeResult?.Uri, Is.TypeOf<Uri>());
+                Assert.That(recipeDTO, Is.Not.Null);
+                Assert.That(recipeDTO?.Id, Is.EqualTo(expectedRecipe.Id));
+                Assert.That(recipeDTO?.Name, Is.EqualTo(expectedRecipe.Name));
+                Assert.That(recipeDTO?.Description, Is.EqualTo(expectedRecipe.Description));
+                Assert.That(recipeDTO?.Uri, Is.EqualTo(expectedRecipe.Uri));
             });
         }
 
-        [Test]
-        public async Task AddRecipeWithWrongUriShouldReturnCreated()
+        [TestCase("foobar")]
+        [TestCase("ftp://example.com")]
+        public async Task AddRecipeWithWrongUriShouldReturnBadRequest(string uri)
         {
-            var recipeToAdd = new AddRecipeDTO { Name = "Foo", Description = "Bar", Uri = "foobar" };
+            var recipeToAdd = new AddRecipeDTO { Name = "Foo", Description = "Bar", Uri = uri };
+
+            _recipeRepositoryMock.Setup(r => r.AddRecipeAsync(recipeToAdd))
+                .ReturnsAsync(Result<RecipeDTO>.Fail(ErrorMessages.InvalidUri));
+
+            // mock RecipeRepository
 
             var result = await _controller.AddRecipe(recipeToAdd);
 
             var resultObject = result as BadRequestObjectResult;
-            
-            
+            var errorResponse = resultObject?.Value as ErrorResponse;
+
             Assert.Multiple(() =>
             {
                 Assert.That(resultObject?.StatusCode, Is.EqualTo(400));
 
-                Assert.That(resultObject?.Value, Is.EqualTo(ErrorMessages.InvalidUri));
+                Assert.That(errorResponse, Is.Not.Null);
+                Assert.That(errorResponse?.Code, Is.EqualTo(ErrorMessages.InvalidUri.Code));
+                Assert.That(errorResponse?.Message, Is.EqualTo(ErrorMessages.InvalidUri.Message));
             });
         }
 
@@ -113,7 +127,7 @@ namespace CookBook_Api.Tests.Cotrollers
             Assert.Multiple(() =>
             {
                 Assert.That(result.Result, Is.Not.Null);
-                           
+
                 Assert.That(resultValue?.Value, Is.EqualTo(recipe));
             });
         }
