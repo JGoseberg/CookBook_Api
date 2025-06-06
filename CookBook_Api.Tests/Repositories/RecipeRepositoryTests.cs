@@ -2,11 +2,11 @@
 using CookBook_Api.Common.ErrorHandling;
 using CookBook_Api.Data;
 using CookBook_Api.DTOs;
+using CookBook_Api.Interfaces.IServices;
 using CookBook_Api.Mappings;
 using CookBook_Api.Models;
 using CookBook_Api.Repositories;
 using Microsoft.EntityFrameworkCore;
-using System;
 
 namespace CookBook_Api.Tests.Repositories
 {
@@ -15,6 +15,7 @@ namespace CookBook_Api.Tests.Repositories
     {
         private DbContextOptions<CookBookContext> _contextOptions;
         private IMapper _mapper;
+        private IRecipeService _recipeService; // TODO MAKE IT WORK! ;)
 
         private readonly IEnumerable<Recipe> _recipes = new Recipe[]
         {
@@ -50,7 +51,8 @@ namespace CookBook_Api.Tests.Repositories
 
             await using var context = new CookBookContext(_contextOptions);
 
-            var repository = new RecipeRepository(context, _mapper);
+            var repository = new RecipeRepository(context, _mapper, _recipeService);
+
 
             await repository.AddRecipeAsync(recipeToAdd);
 
@@ -74,7 +76,7 @@ namespace CookBook_Api.Tests.Repositories
 
             await using var context = new CookBookContext(_contextOptions);
 
-            var repository = new RecipeRepository(context, _mapper);
+            var repository = new RecipeRepository(context, _mapper, _recipeService);
 
             var result = await repository.AddRecipeAsync(recipeToAdd);
 
@@ -94,7 +96,7 @@ namespace CookBook_Api.Tests.Repositories
         {
             await using var context = new CookBookContext(_contextOptions);
 
-            var repository = new RecipeRepository(context, _mapper);
+            var repository = new RecipeRepository(context, _mapper, _recipeService);
 
             await context.Recipes.AddRangeAsync(_recipes);
             await context.SaveChangesAsync();
@@ -110,7 +112,7 @@ namespace CookBook_Api.Tests.Repositories
         {
             await using var context = new CookBookContext(_contextOptions);
 
-            var repository = new RecipeRepository(context, _mapper);
+            var repository = new RecipeRepository(context, _mapper, _recipeService);
 
             var uri = "http://foobar.com";
 
@@ -135,7 +137,7 @@ namespace CookBook_Api.Tests.Repositories
         {
             await using var context = new CookBookContext(_contextOptions);
 
-            var repository = new RecipeRepository(context, _mapper);
+            var repository = new RecipeRepository(context, _mapper, _recipeService);
 
             var recipe = new AddRecipeDTO { Name = "Foo", Description = "Bar", Uri = "http://foobar.com" };
 

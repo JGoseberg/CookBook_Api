@@ -8,7 +8,7 @@ namespace CookBook_Api.Services
 {
     public class RecipeService : IRecipeService
     {
-        public Result<Uri?> ValidateAndParseUri(string uri)
+        public Result<Uri?> ValidateAndParseUri(string? uri)
         {
             if (string.IsNullOrWhiteSpace(uri))
             {
