@@ -35,7 +35,19 @@ namespace CookBook_Api.Controllers
             return Created("", result.Value);
         }
 
-        // TODO Delete(id)
+        [HttpDelete]
+        public async Task<ActionResult> DeleteRecipe(int id)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = await _recipeRepository.DeleteRecipeAsync(id);
+            if (!result.IsSuccess)
+                return NotFound(ErrorResponse.CreateFromError(result.Error!));
+
+            return NoContent();
+        }
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Recipe>>> GetAllRecipes()
         {

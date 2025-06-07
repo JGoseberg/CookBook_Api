@@ -32,26 +32,37 @@ namespace CookBook_Api.Repositories
                 Description = addRecipe.Description,
             };
 
+            List<Error> warnings = [];
+
             var uri = _recipeService.ValidateAndParseUri(addRecipe.Uri);
             if (uri.IsSuccess)
                 recipe.Uri = uri.Value;
+            else if (!string.IsNullOrWhiteSpace(addRecipe.Uri))
+                warnings.Add(uri.Error!);
 
-            //if (!string.IsNullOrWhiteSpace(addRecipe.Uri))
-            //{
-            //    if (!Uri.TryCreate(addRecipe.Uri, UriKind.Absolute, out var recipeUri) ||
-            //    (recipeUri.Scheme != Uri.UriSchemeHttp && recipeUri.Scheme != Uri.UriSchemeHttps))
-            //    {
-            //        return Result<RecipeDTO>.Fail(ErrorMessages.InvalidUri);
-            //    }
-            //    recipe.Uri = recipeUri;
-            //}                
-
-            await _context.Recipes.AddAsync(recipe);
+                await _context.Recipes.AddAsync(recipe);
             await _context.SaveChangesAsync();
 
-            return Result<RecipeDTO>.Success(_mapper.Map<RecipeDTO>(recipe));
+            var recipeDTO = _mapper.Map<RecipeDTO>(recipe);
+
+            if (warnings.Count > 0) 
+                return Result<RecipeDTO>.SuccessWithWarnings(recipeDTO, warnings);
+
+            return Result<RecipeDTO>.Success(recipeDTO);
         }
 
+        public async Task<Result<bool>> DeleteRecipeAsync(int id)
+        {
+            var recipe = await _context.Recipes.FindAsync(id);
+
+            if (recipe == null)
+                return Result<bool>.Fail(ErrorMessages.RecipeNotFound);
+
+            _context.Recipes.Remove(recipe);
+            await _context.SaveChangesAsync();
+
+            return Result<bool>.Success(true);
+        }
 
         public async Task<IEnumerable<RecipeDTO>> GetAllRecipesAsync()
         {

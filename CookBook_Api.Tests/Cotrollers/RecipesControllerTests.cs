@@ -64,8 +64,6 @@ namespace CookBook_Api.Tests.Cotrollers
             _recipeRepositoryMock.Setup(r => r.AddRecipeAsync(recipeToAdd))
                 .ReturnsAsync(Result<RecipeDTO>.Fail(ErrorMessages.InvalidUri));
 
-            // mock RecipeRepository
-
             var result = await _controller.AddRecipe(recipeToAdd);
 
             var resultObject = result as BadRequestObjectResult;
@@ -78,6 +76,38 @@ namespace CookBook_Api.Tests.Cotrollers
                 Assert.That(errorResponse, Is.Not.Null);
                 Assert.That(errorResponse?.Code, Is.EqualTo(ErrorMessages.InvalidUri.Code));
                 Assert.That(errorResponse?.Message, Is.EqualTo(ErrorMessages.InvalidUri.Message));
+            });
+        }
+
+        [Test]
+        public async Task DeleteRecipe_ShouldReturnNoContent()
+        {
+            _recipeRepositoryMock.Setup(r => r.DeleteRecipeAsync(It.IsAny<int>()))
+                .ReturnsAsync(Result<bool>.Success(true));
+
+            var result = await _controller.DeleteRecipe(1);
+
+            Assert.That(result, Is.TypeOf<NoContentResult>());
+        }
+
+        [Test]
+        public async Task DeleteRecipe_ShouldReturnNotFound()
+        {
+            _recipeRepositoryMock.Setup(r => r.DeleteRecipeAsync(It.IsAny<int>()))
+                .ReturnsAsync(Result<bool>.Fail(ErrorMessages.RecipeNotFound));
+
+            var result = await _controller.DeleteRecipe(1);
+
+            var resultObject = result as NotFoundObjectResult;
+
+            var resultValue = resultObject?.Value as ErrorResponse;
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(resultObject?.StatusCode, Is.EqualTo(404));
+
+                Assert.That(resultValue?.Code, Is.EqualTo(ErrorMessages.RecipeNotFound.Code));
+                Assert.That(resultValue?.Message, Is.EqualTo(ErrorMessages.RecipeNotFound.Message));
             });
         }
 
