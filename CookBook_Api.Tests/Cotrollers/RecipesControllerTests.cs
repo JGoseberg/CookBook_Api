@@ -4,8 +4,10 @@ using CookBook_Api.Common.ErrorHandling;
 using CookBook_Api.Controllers;
 using CookBook_Api.DTOs;
 using CookBook_Api.Interfaces.IRepositories;
+using CookBook_Api.Interfaces.IServices;
 using CookBook_Api.Mappings;
 using CookBook_Api.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 
@@ -16,6 +18,7 @@ namespace CookBook_Api.Tests.Cotrollers
     {
         private Mock<IRecipeRepository> _recipeRepositoryMock;
         private IMapper _mapper;
+        private Mock<IRecipeService> _recipeServiceMock;
 
         private RecipesController _controller;
 
@@ -23,8 +26,14 @@ namespace CookBook_Api.Tests.Cotrollers
         public void Setup()
         {
             _recipeRepositoryMock = new Mock<IRecipeRepository>();
+            _recipeServiceMock = new Mock<IRecipeService>();
             _mapper = MapperConfig.InitializeAutoMapper();
-            _controller = new RecipesController(_recipeRepositoryMock.Object, _mapper);
+            _controller = new RecipesController(_mapper, _recipeRepositoryMock.Object, _recipeServiceMock.Object);
+
+            _controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+            };
         }
 
         [TestCase("http://example.com")]
@@ -180,6 +189,124 @@ namespace CookBook_Api.Tests.Cotrollers
                 Assert.That(resultObject?.StatusCode, Is.EqualTo(404));
                 Assert.That(error?.Code, Is.EqualTo(ErrorMessages.RecipeNotFound.Code));
                 Assert.That(error?.Message, Is.EqualTo(ErrorMessages.RecipeNotFound.Message));
+            });
+        }
+
+        [Test]
+        public async Task UpdateRecipe_ShouldReturnNotFound()
+        {
+            _recipeRepositoryMock.Setup(r => r.GetRecipeByIdAsync(It.IsAny<int>()))
+                .ReturnsAsync(Result<RecipeDTO>.Fail(ErrorMessages.RecipeNotFound));
+
+            var updateDto = new UpdateRecipeDTO { Id = 1, Name = "Foo", Description = "Bar" };
+
+            var result = await _controller.UpdateRecipe(1, updateDto);
+
+            var resultObject = result.Result as NotFoundObjectResult;
+
+            var error = resultObject?.Value as ErrorResponse;
+            Assert.Multiple(() =>
+            {
+                Assert.That(resultObject?.StatusCode, Is.EqualTo(404));
+
+                Assert.That(error?.Code, Is.EqualTo(ErrorMessages.RecipeNotFound.Code));
+                Assert.That(error?.Message, Is.EqualTo(ErrorMessages.RecipeNotFound.Message));
+            });
+        }
+
+        [Test]
+        public async Task UpdateRecipe_ShouldReturnBadRequest()
+        {
+            var existingRecipeDto = new RecipeDTO { Id = 1, Name = "Foo", Description = "Bar" };
+
+            _recipeRepositoryMock.Setup(r => r.GetRecipeByIdAsync(It.IsAny<int>()))
+                .ReturnsAsync(Result<RecipeDTO>.Success(existingRecipeDto));
+
+            var updateDto = new UpdateRecipeDTO { Id = 404, Name = "Bar", Description = "Foo" };
+
+            var result = await _controller.UpdateRecipe(1, updateDto);
+
+            var resultObject = result.Result as BadRequestObjectResult;
+
+            var error = resultObject?.Value as ErrorResponse;
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(resultObject?.StatusCode, Is.EqualTo(400));
+
+                Assert.That(error?.Code, Is.EqualTo(ErrorMessages.IdsNotMatching.Code));
+                Assert.That(error?.Message, Is.EqualTo(ErrorMessages.IdsNotMatching.Message));
+
+            });
+        }
+
+        [Test]
+        public async Task UpdateRecipe_ShouldReturnOk()
+        {
+            var existingRecipeDto = new RecipeDTO { Id = 1, Name = "Foo", Description = "Bar" };
+
+            _recipeRepositoryMock
+                .Setup(r => r.GetRecipeByIdAsync(It.IsAny<int>()))
+                .ReturnsAsync(Result<RecipeDTO>.Success(existingRecipeDto));
+
+            var newRecipe = new Recipe { Id = 1, Name = "Bar", Description = "Foo" };
+
+            _recipeServiceMock
+                .Setup(s => s.ValidateAndCreateRecipe(existingRecipeDto, It.IsAny<UpdateRecipeDTO>()))
+                .Returns(Result<Recipe?>.Success(newRecipe));
+
+            _recipeRepositoryMock
+                .Setup(r => r.UpdateRecipeAsync(newRecipe))
+                .ReturnsAsync(Result<RecipeDTO>.Success(new RecipeDTO { Id = 1, Name = "Bar", Description = "Foo" }));
+
+            var updateDto = new UpdateRecipeDTO { Id = 1, Name = "Bar", Description = "Foo" };
+
+            var result = await _controller.UpdateRecipe(1, updateDto);
+
+            var okResult = result.Result as OkObjectResult;
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(okResult, Is.Not.Null);
+                Assert.That(okResult!.StatusCode, Is.EqualTo(200));
+                Assert.That(_controller.Response.Headers.ContainsKey("X-Warnings"), Is.False);
+            });
+        }
+
+        [Test]
+        public async Task UpdateRecipe_ShouldReturnOkWithWarnings()
+        {
+            var existingRecipeDto = new RecipeDTO { Id = 1, Name = "Foo", Description = "Bar" };
+
+            _recipeRepositoryMock
+                .Setup(r => r.GetRecipeByIdAsync(It.IsAny<int>()))
+                .ReturnsAsync(Result<RecipeDTO>.Success(existingRecipeDto));
+
+            var newRecipe = new Recipe { Id = 1, Name = "Bar", Description = "Foo" };
+
+            var warnings = new List<Error> { new Error("Warning", "Some warning occurred") };
+
+            _recipeServiceMock
+                .Setup(s => s.ValidateAndCreateRecipe(existingRecipeDto, It.IsAny<UpdateRecipeDTO>()))
+                .Returns(Result<Recipe?>.SuccessWithWarnings(newRecipe, warnings));
+
+            _recipeRepositoryMock
+                .Setup(r => r.UpdateRecipeAsync(newRecipe))
+                .ReturnsAsync(Result<RecipeDTO>.Success(new RecipeDTO { Id = 1, Name = "Bar", Description = "Foo" }));
+
+            var updateDto = new UpdateRecipeDTO { Id = 1, Name = "Bar", Description = "Foo" };
+
+            var result = await _controller.UpdateRecipe(1, updateDto);
+
+            var okResult = result.Result as OkObjectResult;
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(okResult, Is.Not.Null);
+                Assert.That(okResult!.StatusCode, Is.EqualTo(200));
+
+                Assert.That(_controller.Response.Headers.ContainsKey("X-Warnings"), Is.True);
+                Assert.That(_controller.Response.Headers["X-Warnings"].ToString(), Is.EqualTo("Some warning occurred"));
             });
         }
     }

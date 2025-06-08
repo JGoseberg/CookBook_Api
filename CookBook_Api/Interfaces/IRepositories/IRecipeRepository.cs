@@ -10,5 +10,6 @@ namespace CookBook_Api.Interfaces.IRepositories
         Task<Result<bool>> DeleteRecipeAsync(int id);
         Task<IEnumerable<RecipeDTO>> GetAllRecipesAsync();
         Task<Result<RecipeDTO>> GetRecipeByIdAsync(int id);
+        Task<Result<RecipeDTO>> UpdateRecipeAsync(Recipe recipe);
     }
 }

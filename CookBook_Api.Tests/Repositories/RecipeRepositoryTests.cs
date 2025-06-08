@@ -210,5 +210,37 @@ namespace CookBook_Api.Tests.Repositories
                 Assert.That(result.Error?.Message, Is.EqualTo(ErrorMessages.RecipeNotFound.Message));
             });
         }
+
+        [Test]
+        public async Task UpdateRecipeShouldReturnSuccess()
+        {
+            var recipe = new Recipe { Name = "Foo", Description = "Bar", Uri = new Uri("http://foobar.com") };
+
+            var newRecipe = recipe;
+            newRecipe.Name = "Bar";
+            newRecipe.Description = "Foo";
+            newRecipe.Uri = new Uri("http://barfoo.com");
+
+            await using var context = new CookBookContext(_contextOptions);
+
+            context.Recipes.Add(recipe);
+            await context.SaveChangesAsync();
+
+            var repository = new RecipeRepository(context, _mapper, _recipeService.Object);
+
+            var result = await repository.UpdateRecipeAsync(newRecipe);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.IsSuccess);
+
+                Assert.That(result.Value, Is.Not.Null);
+
+                Assert.That(result.Value?.Id, Is.EqualTo(1));
+                Assert.That(result.Value?.Name, Is.EqualTo(newRecipe.Name));
+                Assert.That(result.Value?.Description, Is.EqualTo(newRecipe.Description));
+                Assert.That(result.Value?.Uri, Is.EqualTo(newRecipe.Uri));
+            });
+        }
     }
 }

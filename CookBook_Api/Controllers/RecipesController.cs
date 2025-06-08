@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using CookBook_Api.Common;
 using CookBook_Api.Common.ErrorHandling;
 using CookBook_Api.DTOs;
 using CookBook_Api.Interfaces.IRepositories;
+using CookBook_Api.Interfaces.IServices;
 using CookBook_Api.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,13 +13,15 @@ namespace CookBook_Api.Controllers
     [Route("/api/[controller]/[action]")]
     public class RecipesController : ControllerBase
     {
-        private readonly IRecipeRepository _recipeRepository;
         private readonly IMapper _mapper;
+        private readonly IRecipeRepository _recipeRepository;
+        private readonly IRecipeService _recipeService;
 
-        public RecipesController(IRecipeRepository recipeRepository, IMapper mapper)
+        public RecipesController(IMapper mapper, IRecipeRepository recipeRepository, IRecipeService recipeService)
         {
-            _recipeRepository = recipeRepository;
             _mapper = mapper;
+            _recipeRepository = recipeRepository;
+            _recipeService = recipeService;
         }
 
 
@@ -62,7 +66,7 @@ namespace CookBook_Api.Controllers
         public async Task<ActionResult<RecipeDTO>> GetRecipeById(int id)
         {
             if (!ModelState.IsValid)
-                return BadRequest();
+                return BadRequest(ModelState);
 
             var recipe = await _recipeRepository.GetRecipeByIdAsync(id);
 
@@ -72,6 +76,27 @@ namespace CookBook_Api.Controllers
             return Ok(recipe.Value);
         }
 
-        // TODO UpdateRecipe (id, recipe)
+        [HttpPatch]
+        public async Task<ActionResult<RecipeDTO>> UpdateRecipe(int id, UpdateRecipeDTO updateRecipeDTO)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var oldRecipeDTO = await _recipeRepository.GetRecipeByIdAsync(id);
+
+            if (!oldRecipeDTO.IsSuccess)
+                return NotFound(ErrorResponse.CreateFromError(oldRecipeDTO.Error!));
+
+            if (updateRecipeDTO.Id != oldRecipeDTO.Value?.Id)
+                return BadRequest(ErrorResponse.CreateFromError(ErrorMessages.IdsNotMatching));
+
+            var recipeResult = _recipeService.ValidateAndCreateRecipe(oldRecipeDTO.Value, updateRecipeDTO);
+
+            await _recipeRepository.UpdateRecipeAsync(recipeResult.Value!);
+
+            WarningHeaderHelper.AddWarningsToResponse(Response, recipeResult.Warnings);
+
+            return Ok(recipeResult.Value);
+        }
     }
 }

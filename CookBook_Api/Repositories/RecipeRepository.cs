@@ -81,5 +81,15 @@ namespace CookBook_Api.Repositories
 
             return Result<RecipeDTO>.Success(_mapper.Map<RecipeDTO>(recipe));
         }
+
+        public async Task<Result<RecipeDTO>> UpdateRecipeAsync(Recipe recipe)
+        {
+            _context.Recipes.Update(recipe);
+            await _context.SaveChangesAsync();
+
+            var recipeDTO = _mapper.Map<RecipeDTO>(recipe);
+
+            return Result<RecipeDTO>.Success(recipeDTO);
+        }
     }
 }
