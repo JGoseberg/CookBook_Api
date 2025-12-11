@@ -110,11 +110,11 @@ namespace CookBook_Api.Tests.Cotrollers
 
             var result = await _controller.GetRecipeById(recipe.Id);
 
-            var resultValue = result.Result as OkObjectResult;
+            var resultValue = result as ObjectResult;
 
             Assert.Multiple(() =>
             {
-                Assert.That(result.Result, Is.Not.Null);
+                Assert.That(result, Is.Not.Null);
                            
                 Assert.That(resultValue?.Value, Is.EqualTo(recipe));
             });
@@ -128,7 +128,7 @@ namespace CookBook_Api.Tests.Cotrollers
 
             var result = await _controller.GetRecipeById(It.IsAny<int>());
 
-            var resultObject = result.Result as NotFoundObjectResult;
+            var resultObject = result as ObjectResult;
 
             var error = resultObject?.Value as ErrorResponse;
 
@@ -136,7 +136,7 @@ namespace CookBook_Api.Tests.Cotrollers
             {
                 Assert.That(result, Is.Not.Null);
                 Assert.That(resultObject?.StatusCode, Is.EqualTo(404));
-                Assert.That(error?.Code, Is.EqualTo(ErrorMessages.RecipeNotFound.Code));
+                Assert.That(error?.Code, Is.EqualTo((404).ToString()));
                 Assert.That(error?.Message, Is.EqualTo(ErrorMessages.RecipeNotFound.Message));
             });
         }

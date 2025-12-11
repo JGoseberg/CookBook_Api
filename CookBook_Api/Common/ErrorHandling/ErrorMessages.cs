@@ -1,8 +1,10 @@
-﻿namespace CookBook_Api.Common.ErrorHandling
+﻿using CookBook_Api.Enums;
+
+namespace CookBook_Api.Common.ErrorHandling
 {
     public static class ErrorMessages
     {
-        public static readonly Error RecipeNotFound = new("RECIPE_NOT_FOUND", "Recipe could not be found.");
-
+        public static readonly Error RecipeNotFound         = new(ErrorCode.RecipeNotFound,     "Recipe could not be found.");
+        public static readonly Error UnexpectedError        = new(ErrorCode.UnexpectedError,    "An Unexpected error occured.");
     }
 }
