@@ -18,6 +18,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: cookbook-api
+    restart: on-failure:3
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
       CONNECTIONSTRING__DEFAULTCONNECTION: ${CONNECTIONSTRING__DEFAULTCONNECTION}
