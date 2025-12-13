@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using CookBook_Api.Common;
 using CookBook_Api.Common.ErrorHandling;
 using CookBook_Api.Data;
+using CookBook_Api.Enums;
 using CookBook_Api.Mappings;
 using CookBook_Api.Models;
 using CookBook_Api.Repositories;
@@ -9,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 namespace CookBook_Api.Tests.Repositories
 {
     [TestFixture]
-    internal class RecipeRepositoryTests
+    public class RecipeRepositoryTests
     {
         private DbContextOptions<CookBookContext> _contextOptions;
         private IMapper _mapper;
@@ -18,6 +20,9 @@ namespace CookBook_Api.Tests.Repositories
         {
             new Recipe {Name="Foo"},
             new Recipe {Name="Bar"},
+
+            new Recipe { Name = "Chilli con Carne", Description = "Bar", Uri = new Uri("http://foobar.com") },
+            new Recipe { Name = "Chilli sin Carne", Description = "Bar", Uri = new Uri("http://foobar.com") },
         };
 
 
@@ -84,7 +89,7 @@ namespace CookBook_Api.Tests.Repositories
 
             var repository = new RecipeRepository(context, _mapper);
 
-            var recipe = new Recipe { Id=1, Name = "Foo", Description = "Bar", Uri = new Uri("http://foobar.com") };
+            var recipe = new Recipe { Name = "Foo", Description = "Bar", Uri = new Uri("http://foobar.com") };
 
             await repository.AddRecipeAsync(recipe);
             await context.SaveChangesAsync();
@@ -106,7 +111,7 @@ namespace CookBook_Api.Tests.Repositories
 
             var repository = new RecipeRepository(context, _mapper);
 
-            var recipe = new Recipe { Id = 1, Name = "Foo", Description = "Bar", Uri = new Uri("http://foobar.com") };
+            var recipe = new Recipe { Name = "Foo", Description = "Bar", Uri = new Uri("http://foobar.com") };
 
             await repository.AddRecipeAsync(recipe);
             await context.SaveChangesAsync();
@@ -117,6 +122,75 @@ namespace CookBook_Api.Tests.Repositories
             {
                 Assert.That(result, Is.Not.Null);
                 Assert.That(result?.Error, Is.EqualTo(ErrorMessages.RecipeNotFound));
+            });
+        }
+
+        [Test]
+        public async Task SearchRecipesAsyncReturnsNotFound()
+        {
+            string searchString = "sin";
+            SelectedOperator op = SelectedOperator.Contains;
+
+            await using var context = new CookBookContext(_contextOptions);
+
+            var repository = new RecipeRepository(context, _mapper);
+
+            await repository.SearchRecipesAsync(searchString, SelectedOperator.Equals);
+
+            var result = await repository.SearchRecipesAsync(searchString, op);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result.Error, Is.EqualTo(ErrorMessages.RecipeNotFound));
+            });
+        }
+
+        [Test]
+        public async Task SearchRecipesAsyncReturnsRecipesForEquals()
+        {
+            string searchString = "Chilli sin Carne";
+            SelectedOperator op = SelectedOperator.Equals;
+
+            await using var context = new CookBookContext(_contextOptions);
+
+            var repository = new RecipeRepository(context, _mapper);
+
+            await context.Recipes.AddRangeAsync(_recipes);
+            await context.SaveChangesAsync();
+
+            var result = await repository.SearchRecipesAsync(searchString, op);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result.IsSuccess, Is.True);
+                Assert.That(result.Value!.Count, Is.EqualTo(1));
+                Assert.That(result.Value[0].Name, Is.EqualTo(searchString));
+            });
+        }
+
+        [Test]
+        public async Task SearchRecipesAsyncReturnsRecipesForContains()
+        {
+            string searchString = "sin";
+            SelectedOperator op = SelectedOperator.Contains;
+
+            await using var context = new CookBookContext(_contextOptions);
+
+            var repository = new RecipeRepository(context, _mapper);
+
+            await context.Recipes.AddRangeAsync(_recipes);
+            await context.SaveChangesAsync();
+
+            var result = await repository.SearchRecipesAsync(searchString, op);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result.IsSuccess, Is.True);
+                Assert.That(result.Value!.Count, Is.EqualTo(1));
+                Assert.That(result.Value[0].Name, Is.EqualTo("Chilli sin Carne"));
             });
         }
     }

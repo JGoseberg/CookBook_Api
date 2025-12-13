@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using CookBook_Api.Common.ErrorHandling;
 using CookBook_Api.DTOs;
+using CookBook_Api.Enums;
+using CookBook_Api.Interfaces.IRecipeService;
 using CookBook_Api.Interfaces.IRepositories;
 using CookBook_Api.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -11,13 +13,15 @@ namespace CookBook_Api.Controllers
     [Route("/api/[controller]/[action]")]
     public class RecipesController : ControllerBase
     {
-        private readonly IRecipeRepository _recipeRepository;
         private readonly IMapper _mapper;
+        private readonly IRecipeRepository _recipeRepository;
+        private readonly IRecipeService _recipeService;
 
-        public RecipesController(IRecipeRepository recipeRepository, IMapper mapper)
+        public RecipesController(IMapper mapper, IRecipeRepository recipeRepository, IRecipeService recipeService)
         {
-            _recipeRepository = recipeRepository;
             _mapper = mapper;
+            _recipeRepository = recipeRepository;
+            _recipeService = recipeService;
         }
 
 
@@ -55,6 +59,25 @@ namespace CookBook_Api.Controllers
                 return BadRequest();
 
             var result = await _recipeRepository.GetRecipeByIdAsync(id);
+
+            if (!result.IsSuccess)
+            {
+                var (status, response) = ErrorHttpMapper.Map(result.Error!);
+                return StatusCode(status, response);
+            }
+
+            return Ok(result.Value);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<RecipeDTO>>> GetRecipesBySearchString(string searchString, SelectedOperator selectedOperator)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var result = await _recipeService.SearchRecipesAsync(searchString, selectedOperator);
 
             if (!result.IsSuccess)
             {

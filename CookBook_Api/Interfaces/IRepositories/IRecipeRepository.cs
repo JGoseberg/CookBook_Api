@@ -1,5 +1,6 @@
 ﻿using CookBook_Api.Common;
 using CookBook_Api.DTOs;
+using CookBook_Api.Enums;
 using CookBook_Api.Models;
 
 namespace CookBook_Api.Interfaces.IRepositories
@@ -9,5 +10,6 @@ namespace CookBook_Api.Interfaces.IRepositories
         Task AddRecipeAsync(Recipe recipeDTO);
         Task<IEnumerable<RecipeDTO>> GetAllRecipesAsync();
         Task<Result<RecipeDTO>> GetRecipeByIdAsync(int id);
+        Task<Result<List<Recipe>>> SearchRecipesAsync(string searchTerm, SelectedOperator selectedOperator);
     }
 }
