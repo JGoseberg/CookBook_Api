@@ -1,6 +1,8 @@
 using CookBook_Api.Data;
+using CookBook_Api.Interfaces.IRecipeService;
 using CookBook_Api.Interfaces.IRepositories;
 using CookBook_Api.Mappings;
+using CookBook_Api.Services;
 using CookBook_Api.Repositories;
 using dotenv.net;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +27,7 @@ builder.Services.AddCors(opt =>
 
 // Add services to the container.
 builder.Services.AddScoped<IRecipeRepository, RecipeRepository>();
+builder.Services.AddScoped<IRecipeService, RecipeService>();
 
 builder.Services.AddControllers();
 

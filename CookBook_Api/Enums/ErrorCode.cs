@@ -3,6 +3,7 @@
     public enum ErrorCode
     {
         RecipeNotFound,
+        SearchTermInvalid,
         UnexpectedError
     }
 }
